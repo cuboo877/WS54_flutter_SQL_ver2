@@ -10,10 +10,6 @@ class SetUpAccountTextForm extends StatefulWidget {
   bool getIsAccountValid() {
     return _SetUpAccountTextFormState().isAccountValid;
   }
-
-  String getAccount() {
-    return set_account_controller.text;
-  }
 }
 
 class _SetUpAccountTextFormState extends State<SetUpAccountTextForm> {

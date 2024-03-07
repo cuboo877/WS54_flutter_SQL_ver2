@@ -181,14 +181,23 @@ class _RegisterPageState extends State<RegisterPage> {
               // hasnt been registered before => details page
               bool result =
                   await Auth.checkRegistered(setup_account_controller.text);
-              if (result == false && mounted) {
-                context.goNamed("/login", extra: {
+
+              if (result == true && mounted) {
+                context.pop();
+                context.go("/login");
+                Utilities.showSnackBar(context, "此帳號已註冊",
+                    const Duration(seconds: 1), Duration.zero);
+              } else {
+                //HACK// test
+                context.pop();
+                context.push("/details", extra: {
                   "account": setup_account_controller.text,
                   "password": setup_password_controller.text
                 });
-                Utilities.showSnackBar(context, "此帳號已註冊",
-                    const Duration(seconds: 1), Duration.zero);
-              } else {}
+              }
+              setState(() {
+                isLoading = false;
+              });
             }
           },
           child: Row(

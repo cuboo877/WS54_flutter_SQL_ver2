@@ -4,11 +4,7 @@ import '../../constant/styleguide.dart';
 
 class SetUpPasswordTextForm extends StatefulWidget {
   const SetUpPasswordTextForm(
-      // ignore: non_constant_identifier_names
-      {super.key,
-      required this.setup_password_controller});
-
-  // ignore: non_constant_identifier_names
+      {super.key, required this.setup_password_controller});
   final TextEditingController setup_password_controller;
 
   @override

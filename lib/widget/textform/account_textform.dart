@@ -4,26 +4,32 @@ import 'package:ws54_flutter_sql_ver2/constant/styleguide.dart';
 class AccountTextForm extends StatefulWidget {
   AccountTextForm(
       {super.key,
-      this.initValue,
+      required this.controller,
+      required this.onChanged,
       required this.doAuthWarning,
-      required this.controller});
+      this.isRead = false});
   bool doAuthWarning;
-  String? initValue;
+  bool isRead;
+  final ValueChanged<bool> onChanged;
   final TextEditingController controller;
   @override
   State<StatefulWidget> createState() => _AccountTextFormState();
-
-  bool getIsAccountValid() {
-    return _AccountTextFormState().isAccountValid;
-  }
-
-  String getAccount() {
-    return controller.text;
-  }
 }
 
 class _AccountTextFormState extends State<AccountTextForm> {
   bool isAccountValid = false;
+  // late TextEditingController controller;
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   controller = TextEditingController();
+  // }
+
+  // @override
+  // void dispose() {
+  //   controller.dispose();
+  //   super.dispose();
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -32,10 +38,10 @@ class _AccountTextFormState extends State<AccountTextForm> {
       child: TextFormField(
         keyboardType: TextInputType.emailAddress,
         controller: widget.controller,
+        readOnly: widget.isRead,
         autovalidateMode: AutovalidateMode.onUserInteraction,
         onTap: () {
           setState(() {
-            widget.controller.text = widget.initValue ?? "null";
             if (widget.doAuthWarning == true) {
               widget.doAuthWarning = false;
             }
@@ -44,16 +50,20 @@ class _AccountTextFormState extends State<AccountTextForm> {
         validator: (value) {
           if (widget.doAuthWarning) {
             isAccountValid = false;
+            widget.onChanged(isAccountValid);
             return "";
           } else if (value == null || value == "") {
             isAccountValid = false;
+            widget.onChanged(isAccountValid);
             return "請輸入您的帳號";
           } else if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
               .hasMatch(value)) {
             isAccountValid = false;
+            widget.onChanged(isAccountValid);
             return "請輸入正確的信箱格式";
           }
           isAccountValid = true;
+          widget.onChanged(isAccountValid);
           return null;
         },
         style: CustomFont.textFormInputText,

@@ -2,17 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:ws54_flutter_sql_ver2/constant/static_data.dart';
 import 'package:ws54_flutter_sql_ver2/constant/styleguide.dart';
 import 'package:ws54_flutter_sql_ver2/service/auth.dart';
+import 'package:ws54_flutter_sql_ver2/service/sharedPref.dart';
 import 'package:ws54_flutter_sql_ver2/service/utilities.dart';
 import 'package:ws54_flutter_sql_ver2/widget/textform/account_textform.dart';
 import 'package:ws54_flutter_sql_ver2/widget/title_widget.dart';
 import 'package:go_router/go_router.dart';
+import '../service/sql_serivce.dart';
 import '../widget/swith_to_login_or_register.dart';
 import '../widget/textform/password_textform.dart';
 
 class LoginPage extends StatefulWidget {
-  LoginPage({super.key, this.initAccount, this.initPassword});
-  String? initAccount;
-  String? initPassword;
+  const LoginPage({super.key});
   @override
   State<StatefulWidget> createState() => _LoginPageState();
 }
@@ -21,24 +21,15 @@ class _LoginPageState extends State<LoginPage> {
   bool isLoading = false;
   bool isTermAgree = false;
   bool doAuthWarning = false;
-
+  bool isAccountValid = false;
+  bool isPasswordValid = false;
   late TextEditingController account_controller;
   late TextEditingController password_controller;
-
   @override
   void initState() {
     super.initState();
-    if (widget.initAccount != null) {
-      account_controller = TextEditingController(text: widget.initAccount);
-    } else {
-      account_controller = TextEditingController();
-    }
-
-    if (widget.initPassword != null) {
-      password_controller = TextEditingController(text: widget.initPassword);
-    } else {
-      password_controller = TextEditingController();
-    }
+    account_controller = TextEditingController();
+    password_controller = TextEditingController();
   }
 
   @override
@@ -72,9 +63,12 @@ class _LoginPageState extends State<LoginPage> {
                       height: 20,
                     ),
                     AccountTextForm(
-                        doAuthWarning: doAuthWarning,
-                        initValue: widget.initAccount,
-                        controller: account_controller),
+                      controller: account_controller,
+                      onChanged: (value) {
+                        isAccountValid = value;
+                      },
+                      doAuthWarning: doAuthWarning,
+                    ),
                     const SizedBox(
                       height: 20,
                     ),
@@ -86,9 +80,12 @@ class _LoginPageState extends State<LoginPage> {
                       height: 20,
                     ),
                     PasswordTextForm(
-                        doAuthWarning: doAuthWarning,
-                        initValue: widget.initPassword,
-                        controller: password_controller),
+                      controller: password_controller,
+                      onChanged: (value) {
+                        isPasswordValid = value;
+                      },
+                      doAuthWarning: doAuthWarning,
+                    ),
                     const SizedBox(
                       height: 20,
                     ),
@@ -180,23 +177,30 @@ class _LoginPageState extends State<LoginPage> {
               setState(() {
                 isLoading = true;
               });
-
+              print("${password_controller.text} : password_controller");
               // ignore: no_leading_underscores_for_local_identifiers
               Object _loginResult = await Auth.loginAuthentication(
-                  doAuthWarning, password_controller, account_controller);
+                  isAccountValid,
+                  isPasswordValid,
+                  doAuthWarning,
+                  account_controller.text,
+                  password_controller.text);
+
+              print("${_loginResult != false} : got login result?");
+
               if (_loginResult != false) {
+                UserData userData = _loginResult as UserData;
                 setState(() {
                   doAuthWarning = false;
                   context.pop();
-                  context.go("/home", extra: _loginResult);
+                  context.go("/home", extra: userData);
                   isLoading = false;
+                  sharedPref.setLoggedAccount(userData.account);
                   Utilities.showSnackBar(
                       context,
-                      "登入成功!",
+                      "登入成功! 目前使用者: ${userData.username}",
                       const Duration(seconds: 2),
                       const Duration(milliseconds: 500));
-                  Utilities.showSnackBar(context, "目前使用者",
-                      const Duration(seconds: 3), Duration.zero);
                 });
               } else {
                 setState(() {

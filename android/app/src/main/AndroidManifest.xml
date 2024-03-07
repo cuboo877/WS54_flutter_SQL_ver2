@@ -1,9 +1,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.ws54_flutter_sql_ver2">
    <application
-        android:label="ws54_flutter_sql_ver2"
+        android:label="54 Password Manager"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/appicon">
         <activity
             android:name=".MainActivity"
             android:exported="true"

@@ -5,24 +5,17 @@ import '../../constant/styleguide.dart';
 class PasswordTextForm extends StatefulWidget {
   PasswordTextForm(
       {super.key,
-      this.initValue,
+      required this.controller,
+      required this.onChanged,
       required this.doAuthWarning,
-      required this.controller});
+      this.isRead = false});
 
   bool doAuthWarning;
-
-  String? initValue;
-  TextEditingController controller;
+  bool isRead;
+  final ValueChanged<bool> onChanged;
+  final TextEditingController controller;
   @override
   State<StatefulWidget> createState() => _PasswordTextFormState();
-
-  bool getIsPasswordValid() {
-    return _PasswordTextFormState().isPasswordValid;
-  }
-
-  String getPassword() {
-    return controller.text;
-  }
 }
 
 class _PasswordTextFormState extends State<PasswordTextForm> {
@@ -37,6 +30,7 @@ class _PasswordTextFormState extends State<PasswordTextForm> {
           obscureText: obscure,
           controller: widget.controller,
           style: CustomFont.textFormInputText,
+          readOnly: widget.isRead,
           autovalidateMode: AutovalidateMode.onUserInteraction,
           onTap: () {
             setState(() {
@@ -48,12 +42,15 @@ class _PasswordTextFormState extends State<PasswordTextForm> {
           validator: (value) {
             if (widget.doAuthWarning) {
               isPasswordValid = false;
+              widget.onChanged(isPasswordValid);
               return "錯誤的帳號或密碼";
             } else if (value == null || value == "") {
               isPasswordValid = false;
+              widget.onChanged(isPasswordValid);
               return "請輸入您的密碼";
             }
             isPasswordValid = true;
+            widget.onChanged(isPasswordValid);
             return null;
           },
           decoration: InputDecoration(
